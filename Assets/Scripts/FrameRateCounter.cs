@@ -11,7 +11,7 @@ public class FrameRateCounter : MonoBehaviour
     void Start()
     {
         StartCoroutine(UpdateFrameRate());
-        Application.targetFrameRate = -1;
+        Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
     }
 
     private IEnumerator UpdateFrameRate()
