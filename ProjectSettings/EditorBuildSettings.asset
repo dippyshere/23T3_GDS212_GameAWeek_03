@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/SimplePoly City - Low Poly.unity
+    guid: b2d665e17a92dd34ea2aef6f1afea6d2
   m_configObjects: {}

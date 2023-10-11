@@ -5,7 +5,7 @@ using Cinemachine;
 
 public class PlayerController : MonoBehaviour
 {
-    public int spawnInterval = 5;
+    public float spawnInterval = 5;
     public GameObject[] towerComponents;
     public Rigidbody baseTowerRigidBody;
     public GameObject towerCentre;
@@ -18,12 +18,16 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (UnityEngine.SceneManagement.SceneManager.GetSceneByName("SimplePoly City - Low Poly").isLoaded == false)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("SimplePoly City - Low Poly", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+        }
         Input.gyro.enabled = true;
         calibrationOffset = Input.gyro.attitude.eulerAngles.z;
         InvokeRepeating("SpawnTowerComponent", spawnInterval, spawnInterval);
         virtualCameraFramingTransposer = virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
         virtualCameraFramingTransposer.m_CameraDistance = 5;
-        towerCentre.transform.position = new Vector3(transform.position.x, transform.position.y + activeTowerComponents.Count, transform.position.z);
+        towerCentre.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         towerCentre.transform.rotation = Quaternion.Euler(5, 0, 0);
     }
 
@@ -57,7 +61,7 @@ public class PlayerController : MonoBehaviour
             newTowerComponent.GetComponent<HingeJoint>().connectedBody = activeTowerComponents[activeTowerIndex - 1].GetComponent<Rigidbody>();
         }
         activeTowerIndex++;
-        towerCentre.transform.position = new Vector3(transform.position.x, transform.position.y + activeTowerComponents.Count, transform.position.z);
+        towerCentre.transform.position = new Vector3(transform.position.x, activeTowerComponents[activeTowerComponents.Count - 1].transform.position.y, transform.position.z);
         if (activeTowerComponents.Count <= 14 )
         {
             virtualCameraFramingTransposer.m_CameraDistance = 5 + 1.25f * activeTowerComponents.Count;
