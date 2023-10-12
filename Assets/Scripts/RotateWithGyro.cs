@@ -13,6 +13,8 @@ public class RotateWithGyro : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.rotation = Input.gyro.attitude;
+        Quaternion gyro = Input.gyro.attitude;
+        gyro = Quaternion.Euler(90, 0, 0) * new Quaternion(-gyro.x, -gyro.y, gyro.z, gyro.w);
+        transform.rotation = gyro;
     }
 }
