@@ -867,6 +867,8 @@ PlayerSettings:
   additionalCompilerArguments:
     Android:
     - -optimize+
+    WebGL:
+    - -optimize+
   platformArchitecture: {}
   scriptingBackend:
     Android: 1
@@ -987,11 +989,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 3160410b-d61c-4cb2-b7e9-4acd80107041
+  cloudProjectId: 
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 23T3_GDS212_GameAWeek_03
-  organizationId: dippyshere
+  projectName: 
+  organizationId: 
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

@@ -118,7 +118,6 @@ QualitySettings:
     excludedTargetPlatforms:
     - Standalone
     - Server
-    - WebGL
   - serializedVersion: 4
     name: High Fidelity
     pixelLightCount: 2
@@ -148,7 +147,7 @@ QualitySettings:
     adaptiveVsyncExtraB: 0
     lodBias: 2
     maximumLODLevel: 0
-    enableLODCrossFade: 1
+    enableLODCrossFade: 0
     streamingMipmapsActive: 1
     streamingMipmapsAddAllCameras: 1
     streamingMipmapsMemoryBudget: 1024
@@ -172,7 +171,6 @@ QualitySettings:
     terrainFadeLength: 5
     terrainMaxTrees: 50
     excludedTargetPlatforms:
-    - Standalone
     - Server
     - Android
     - WebGL
