@@ -732,6 +732,43 @@ void ComputeSingleScattering(
     mie = mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering;
 }
 
+void ComputeSingleScattering(
+    IN(AtmosphereParameters) atmosphere,
+    IN(TransmittanceTexture) transmittance_texture,
+    Length r, Number mu, Number mu_s, Number nu,
+    bool ray_r_mu_intersects_ground,
+    OUT(IrradianceSpectrum4) rayleigh, OUT(IrradianceSpectrum4) mie)
+{
+    assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
+    assert(mu >= -1.0 && mu <= 1.0);
+    assert(mu_s >= -1.0 && mu_s <= 1.0);
+    assert(nu >= -1.0 && nu <= 1.0);
+
+    // Number of intervals for the numerical integration.
+    const int SAMPLE_COUNT = 50;
+    // The integration step, i.e. the length of each integration interval.
+    Length dx = DistanceToNearestAtmosphereBoundary(atmosphere, r, mu,
+                    ray_r_mu_intersects_ground)
+        / Number(SAMPLE_COUNT);
+    // Integration loop.
+    DimensionlessSpectrum rayleigh_sum = 0.0;
+    DimensionlessSpectrum mie_sum = 0.0;
+    for (int i = 0; i <= SAMPLE_COUNT; ++i) {
+        Length d_i = Number(i) * dx;
+        // The Rayleigh and Mie single scattering at the current sample point.
+        DimensionlessSpectrum rayleigh_i;
+        DimensionlessSpectrum mie_i;
+        ComputeSingleScatteringIntegrand(atmosphere, transmittance_texture,
+            r, mu, mu_s, nu, d_i, ray_r_mu_intersects_ground, rayleigh_i, mie_i);
+        // Sample weight (from the trapezoidal rule).
+        Number weight_i = (i == 0 || i == SAMPLE_COUNT) ? 0.5 : 1.0;
+        rayleigh_sum += rayleigh_i * weight_i;
+        mie_sum += mie_i * weight_i;
+    }
+    rayleigh = float4(rayleigh_sum * dx * atmosphere.solar_irradiance * atmosphere.rayleigh_scattering, 1.0);
+    mie = float4(mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering, 1.0);
+}
+
 /*
 <p>Note that we added the solar irradiance and the scattering coefficient terms
 that we omitted in <code>ComputeSingleScatteringIntegrand</code>, but not the
@@ -924,6 +961,21 @@ the single scattering in a 3D texture:
 void ComputeSingleScatteringTexture(IN(AtmosphereParameters) atmosphere,
     IN(TransmittanceTexture) transmittance_texture, IN(float3) frag_coord,
     OUT(IrradianceSpectrum) rayleigh, OUT(IrradianceSpectrum) mie)
+{
+    Length r;
+    Number mu;
+    Number mu_s;
+    Number nu;
+    bool ray_r_mu_intersects_ground;
+    GetRMuMuSNuFromScatteringTextureFragCoord(atmosphere, frag_coord,
+        r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+    ComputeSingleScattering(atmosphere, transmittance_texture,
+        r, mu, mu_s, nu, ray_r_mu_intersects_ground, rayleigh, mie);
+}
+
+void ComputeSingleScatteringTexture(IN(AtmosphereParameters) atmosphere,
+    IN(TransmittanceTexture) transmittance_texture, IN(float3) frag_coord,
+    OUT(IrradianceSpectrum4) rayleigh, OUT(IrradianceSpectrum4) mie)
 {
     Length r;
     Number mu;

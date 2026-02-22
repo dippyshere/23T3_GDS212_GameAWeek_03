@@ -6,6 +6,9 @@ namespace Aerosol {
     class Aerosol : MonoBehaviour {
         public Config Config;
         static Model model;
+        static readonly int TransmittanceTexture = Shader.PropertyToID("transmittance_texture");
+        static readonly int ScatteringTexture = Shader.PropertyToID("scattering_texture");
+        static readonly int IrradianceTexture = Shader.PropertyToID("irradiance_texture");
 
         void Awake() {
             Init();
@@ -18,19 +21,22 @@ namespace Aerosol {
         void Init() {
             model = new Model(Config);
             model.Init();
-            Config.Skybox.SetTexture("transmittance_texture", model.Transmittance);
-            Config.Skybox.SetTexture("scattering_texture", model.Scattering);
-            Config.Skybox.SetTexture("irradiance_texture", model.Irradiance);
+            Config.Skybox.SetTexture(TransmittanceTexture, model.Transmittance);
+            Config.Skybox.SetTexture(ScatteringTexture, model.Scattering);
+            Config.Skybox.SetTexture(IrradianceTexture, model.Irradiance);
         }
 
+#if UNITY_EDITOR
         [ContextMenu("GenHeader")]
         void GenHeader() {
-            var path = Path.Combine(Application.dataPath,
+            string path = Path.Combine(Application.dataPath,
                 "beantowel/Aerosol/Shaders/header.hlsl");
-            var header = Model.Header(Config.Params, Const.Lambdas);
+            string header = Model.Header(Config.Params, Const.Lambdas);
             File.WriteAllText(path, header);
+            AssetDatabase.Refresh();
+            Init();
         }
-
+#endif
         public (RenderTexture, RenderTexture, RenderTexture) GetTextures() {
             return (model.Transmittance, model.Irradiance, model.Scattering);
         }

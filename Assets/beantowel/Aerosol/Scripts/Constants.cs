@@ -128,15 +128,15 @@ namespace Aerosol {
         };
 
         public static readonly Vector3[] XYZToSRGB = {
-            new Vector3(+3.2406f, -1.5372f, -0.4986f),
-            new Vector3(-0.9689f, +1.8758f, +0.0415f),
-            new Vector3(+0.0557f, -0.2040f, +1.0570f)
+            new(+3.2406f, -1.5372f, -0.4986f),
+            new(-0.9689f, +1.8758f, +0.0415f),
+            new(+0.0557f, -0.2040f, +1.0570f)
         };
 
         public const double LambdaR = 680.0;
         public const double LambdaG = 550.0;
         public const double LambdaB = 440.0;
-        public static readonly Vector3 Lambdas = new Vector3(
+        public static readonly Vector3 Lambdas = new(
             (float)LambdaR, (float)LambdaG, (float)LambdaB);
 
         public const int LambdaMin = 360;
@@ -192,16 +192,19 @@ namespace Aerosol {
         public const double MiePhaseFunctionG = 0.8;
         public const double GroundAlbedo = 0.1;
         public static readonly Func<bool, double> MaxSunZenithAngle =
-            (bool half_precision) => (half_precision ? 102.0 : 120.0) / 180.0 * Math.PI;
-        public static readonly DensityProfileLayer RayleighLayer = new DensityProfileLayer {
+            half_precision => (half_precision ? 102.0 : 120.0) / 180.0 * Math.PI;
+        public static readonly DensityProfileLayer RayleighLayer = new()
+        {
             ExpTerm = 1.0,
             ExpScale = -1.0 / RayleighScaleHeight,
         };
-        public static readonly DensityProfileLayer MieLayer = new DensityProfileLayer {
+        public static readonly DensityProfileLayer MieLayer = new()
+        {
             ExpTerm = 1.0,
             ExpScale = -1.0 / MieScaleHeight,
         };
-        public static readonly List<DensityProfileLayer> OzoneDensity = new List<DensityProfileLayer>{
+        public static readonly List<DensityProfileLayer> OzoneDensity = new()
+        {
             new DensityProfileLayer{
                 Width = 25000.0,
                 LinearTerm = 1.0 / 15000.0,
@@ -215,17 +218,17 @@ namespace Aerosol {
 
         public static ModelParams DefaultParam() {
             int nLambda = (LambdaMax - LambdaMin) / DeltaLambda + 1;
-            var wavelengths = new List<double>(nLambda); // [LambdaMin, LambdaMax], step=DeltaLambda
-            var solarIrradiance = new List<double>(nLambda);
-            var rayleighScattering = new List<double>(nLambda);
-            var mieScattering = new List<double>(nLambda);
-            var mieExtinction = new List<double>(nLambda);
-            var absorptionExtinction = new List<double>(nLambda);
-            var groundAlbedo = new List<double>(nLambda);
+            List<double> wavelengths = new(nLambda); // [LambdaMin, LambdaMax], step=DeltaLambda
+            List<double> solarIrradiance = new(nLambda);
+            List<double> rayleighScattering = new(nLambda);
+            List<double> mieScattering = new(nLambda);
+            List<double> mieExtinction = new(nLambda);
+            List<double> absorptionExtinction = new(nLambda);
+            List<double> groundAlbedo = new(nLambda);
 
             for (int l = LambdaMin; l <= LambdaMax; l += DeltaLambda) {
                 int index = (l - LambdaMin) / DeltaLambda;
-                double lambda = (double)l * 1e-3; // micro-meters, nm->um
+                double lambda = l * 1e-3; // micro-meters, nm->um
                 double mie = MieAngstromBeta / MieScaleHeight * Math.Pow(lambda, -MieAngstromAlpha);
                 wavelengths.Add(l);
                 solarIrradiance.Add(SolarIrradiance[index]);

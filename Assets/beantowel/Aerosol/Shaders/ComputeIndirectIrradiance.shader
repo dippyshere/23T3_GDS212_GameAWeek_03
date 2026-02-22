@@ -38,8 +38,8 @@ Shader "Aerosol/ComputeIndirectIrradiance"
 
             struct PS_OUTPUT
             {
-                float3 delta_irradiance : SV_Target0;
-                float3 irradiance : SV_Target1;
+                float4 delta_irradiance : SV_Target0;
+                float4 irradiance : SV_Target1;
             };
 
             VS_OUTPUT vertex(VS_INPUT v)
@@ -53,11 +53,11 @@ Shader "Aerosol/ComputeIndirectIrradiance"
             PS_OUTPUT frag(VS_OUTPUT input)
             {
                 PS_OUTPUT output;
-                output.delta_irradiance = ComputeIndirectIrradianceTexture(
+                output.delta_irradiance = float4(ComputeIndirectIrradianceTexture(
                     ATMOSPHERE, single_rayleigh_scattering_texture,
                     single_mie_scattering_texture, multiple_scattering_texture,
-                    input.texcoords, scattering_order);
-                output.irradiance = mul((float3x3)luminance_from_radiance, output.delta_irradiance);
+                    input.texcoords, scattering_order), 1.0);
+                output.irradiance = float4(mul((float3x3)luminance_from_radiance, output.delta_irradiance), 1.0);
                 return output;
             }
             ENDHLSL

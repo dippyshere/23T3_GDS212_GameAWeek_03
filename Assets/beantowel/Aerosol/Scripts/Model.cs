@@ -12,7 +12,7 @@ namespace Aerosol {
         public double ConstantTerm;
     }
 
-    [System.Serializable]
+    [Serializable]
     public struct ModelParams {
         public List<double> Wavelengths;
         public List<double> SolarIrradiance;
@@ -33,10 +33,18 @@ namespace Aerosol {
     }
 
     class Model {
-        public RenderTexture Transmittance;
-        public RenderTexture Scattering;
-        public RenderTexture Irradiance;
-        public Config Conf;
+        static readonly int TransmittanceTexture = Shader.PropertyToID("transmittance_texture");
+        static readonly int LuminanceFromRadiance = Shader.PropertyToID("luminance_from_radiance");
+        static readonly int SingleRayleighScatteringTexture = Shader.PropertyToID("single_rayleigh_scattering_texture");
+        static readonly int SingleMieScatteringTexture = Shader.PropertyToID("single_mie_scattering_texture");
+        static readonly int MultipleScatteringTexture = Shader.PropertyToID("multiple_scattering_texture");
+        static readonly int IrradianceTexture = Shader.PropertyToID("irradiance_texture");
+        static readonly int ScatteringOrder = Shader.PropertyToID("scattering_order");
+        static readonly int ScatteringDensityTexture = Shader.PropertyToID("scattering_density_texture");
+        public readonly RenderTexture Transmittance;
+        public readonly RenderTexture Scattering;
+        public readonly RenderTexture Irradiance;
+        Config Conf;
 
         RenderTextureDescriptor TrnDesc, SctDesc, IrrDesc;
         Material ComputeTransmittance, ComputeDirectIrradiance,
@@ -103,62 +111,58 @@ namespace Aerosol {
             Matrix4x4 luminanceFromRadiance,
             uint numScatteringOrders
         ) {
-            Debug.Log("pre-compute model");
             // Compute the transmittance, and store it in transmittance_texture_.
             Util.DrawRect(ComputeTransmittance, Transmittance);
 
             // Compute the direct irradiance, store it in delta_irradiance_texture.
             // (we don't want the direct irradiance in irradiance_texture_,
             // but only the irradiance from the sky).
-            ComputeDirectIrradiance.SetTexture("transmittance_texture", Transmittance);
+            ComputeDirectIrradiance.SetTexture(TransmittanceTexture, Transmittance);
             Util.DrawRect(ComputeDirectIrradiance, deltaIrradiance, Irradiance);
 
             // Compute the rayleigh and mie single scattering, store them in
             // delta_rayleigh_scattering_texture and delta_mie_scattering_texture, and
             // either store them or accumulate them in scattering_texture_ and
             // optional_single_mie_scattering_texture_.
-            ComputeSingleScattering.SetMatrix("luminance_from_radiance", luminanceFromRadiance);
-            ComputeSingleScattering.SetTexture("transmittance_texture", Transmittance);
+            ComputeSingleScattering.SetMatrix(LuminanceFromRadiance, luminanceFromRadiance);
+            ComputeSingleScattering.SetTexture(TransmittanceTexture, Transmittance);
             Util.DrawCube(ComputeSingleScattering,
                 deltaRayleighScattering, deltaMieScattering, Scattering);
             // Compute the 2nd, 3rd and 4th order of scattering, in sequence.
             for (uint order = 2; order <= numScatteringOrders; order++) {
                 // Compute the scattering density, and store it in
                 // delta_scattering_density_texture.
-                ComputeScatteringDensity.SetTexture("transmittance_texture", Transmittance);
-                ComputeScatteringDensity.SetTexture("single_rayleigh_scattering_texture", deltaRayleighScattering);
-                ComputeScatteringDensity.SetTexture("single_mie_scattering_texture", deltaMieScattering);
-                ComputeScatteringDensity.SetTexture("multiple_scattering_texture", deltaMultipleScattering);
-                ComputeScatteringDensity.SetTexture("irradiance_texture", deltaIrradiance);
-                ComputeScatteringDensity.SetInteger("scattering_order", (int)order);
+                ComputeScatteringDensity.SetTexture(TransmittanceTexture, Transmittance);
+                ComputeScatteringDensity.SetTexture(SingleRayleighScatteringTexture, deltaRayleighScattering);
+                ComputeScatteringDensity.SetTexture(SingleMieScatteringTexture, deltaMieScattering);
+                ComputeScatteringDensity.SetTexture(MultipleScatteringTexture, deltaMultipleScattering);
+                ComputeScatteringDensity.SetTexture(IrradianceTexture, deltaIrradiance);
+                ComputeScatteringDensity.SetInteger(ScatteringOrder, (int)order);
                 Util.DrawCube(ComputeScatteringDensity, deltaScatteringDensity);
 
                 // Compute the indirect irradiance, store it in delta_irradiance_texture and
                 // accumulate it in irradiance_texture_.
-                ComputeIndirectIrradiance.SetMatrix("luminance_from_radiance", luminanceFromRadiance);
-                ComputeIndirectIrradiance.SetTexture("single_rayleigh_scattering_texture", deltaRayleighScattering);
-                ComputeIndirectIrradiance.SetTexture("single_mie_scattering_texture", deltaMieScattering);
-                ComputeIndirectIrradiance.SetTexture("multiple_scattering_texture", deltaMultipleScattering);
-                ComputeIndirectIrradiance.SetInteger("scattering_order", (int)order - 1);
+                ComputeIndirectIrradiance.SetMatrix(LuminanceFromRadiance, luminanceFromRadiance);
+                ComputeIndirectIrradiance.SetTexture(SingleRayleighScatteringTexture, deltaRayleighScattering);
+                ComputeIndirectIrradiance.SetTexture(SingleMieScatteringTexture, deltaMieScattering);
+                ComputeIndirectIrradiance.SetTexture(MultipleScatteringTexture, deltaMultipleScattering);
+                ComputeIndirectIrradiance.SetInteger(ScatteringOrder, (int)order - 1);
                 deltaIrradiance.DiscardContents();
                 Util.DrawRect(ComputeIndirectIrradiance, deltaIrradiance, Irradiance);
 
                 // Compute the multiple scattering, store it in
                 // delta_multiple_scattering_texture, and accumulate it in
                 // scattering_texture_.
-                ComputeMultipleScattering.SetMatrix("luminance_from_radiance", luminanceFromRadiance);
-                ComputeMultipleScattering.SetTexture("transmittance_texture", Transmittance);
-                ComputeMultipleScattering.SetTexture("scattering_density_texture", deltaScatteringDensity);
+                ComputeMultipleScattering.SetMatrix(LuminanceFromRadiance, luminanceFromRadiance);
+                ComputeMultipleScattering.SetTexture(TransmittanceTexture, Transmittance);
+                ComputeMultipleScattering.SetTexture(ScatteringDensityTexture, deltaScatteringDensity);
                 deltaMultipleScattering.DiscardContents();
                 Util.DrawCube(ComputeMultipleScattering, deltaMultipleScattering, Scattering);
             }
         }
 
         static Vector3 CIEColorMatchingFunctionTableValue(double wavelength) {
-            Func<int, int, double> color = (int row, int column) =>
-                Const.CIE2DegColorMatchingFunctions[4 * row + column];
-
-            if (wavelength < Const.LambdaMin || wavelength > Const.LambdaMax) {
+            if (wavelength is < Const.LambdaMin or > Const.LambdaMax) {
                 return Vector3.zero;
             }
             double u = (wavelength - Const.LambdaMin) / Const.CIEFuncDeltaLambda;
@@ -167,10 +171,12 @@ namespace Aerosol {
             Assert.IsTrue(Const.CIE2DegColorMatchingFunctions[4 * row] <= wavelength &&
                    Const.CIE2DegColorMatchingFunctions[4 * (row + 1)] >= wavelength);
             u -= row;
-            var x = color(row, 1) * (1.0 - u) + color(row + 1, 1) * u;
-            var y = color(row, 2) * (1.0 - u) + color(row + 1, 2) * u;
-            var z = color(row, 3) * (1.0 - u) + color(row + 1, 3) * u;
+            double x = Color(row, 1) * (1.0 - u) + Color(row + 1, 1) * u;
+            double y = Color(row, 2) * (1.0 - u) + Color(row + 1, 2) * u;
+            double z = Color(row, 3) * (1.0 - u) + Color(row + 1, 3) * u;
             return new Vector3((float)x, (float)y, (float)z);
+
+            double Color(int row, int column) => Const.CIE2DegColorMatchingFunctions[4 * row + column];
         }
 
         static double Interpolate(
@@ -187,7 +193,7 @@ namespace Aerosol {
                     return wavelengthFunction[i] * (1.0 - u) + wavelengthFunction[i + 1] * u;
                 }
             }
-            return wavelengthFunction[wavelengthFunction.Count - 1];
+            return wavelengthFunction[^1];
         }
 
         // The returned constants are in lumen.nm / watt.
@@ -201,10 +207,10 @@ namespace Aerosol {
             double solarB = Interpolate(wavelengths, solarIrradiance, Const.LambdaB);
             int dLambda = 1;
             for (int lambda = Const.LambdaMin; lambda < Const.LambdaMax; lambda += dLambda) {
-                var xyzBar = CIEColorMatchingFunctionTableValue(lambda);
-                var rBar = Vector3.Dot(Const.XYZToSRGB[0], xyzBar);
-                var gBar = Vector3.Dot(Const.XYZToSRGB[1], xyzBar);
-                var bBar = Vector3.Dot(Const.XYZToSRGB[2], xyzBar);
+                Vector3 xyzBar = CIEColorMatchingFunctionTableValue(lambda);
+                float rBar = Vector3.Dot(Const.XYZToSRGB[0], xyzBar);
+                float gBar = Vector3.Dot(Const.XYZToSRGB[1], xyzBar);
+                float bBar = Vector3.Dot(Const.XYZToSRGB[2], xyzBar);
                 double irradiance = Interpolate(wavelengths, solarIrradiance, lambda);
                 kRGB.x += (float)(rBar * irradiance / solarR * Math.Pow(lambda / Const.LambdaR, lambdaPower));
                 kRGB.y += (float)(gBar * irradiance / solarG * Math.Pow(lambda / Const.LambdaG, lambdaPower));
@@ -215,32 +221,40 @@ namespace Aerosol {
         }
 
         public static string Header(ModelParams para, Vector3 lambdas) {
-            Func<List<double>, double, string> toString = (List<double> spectrum, double scale) => {
-                double r = Model.Interpolate(para.Wavelengths, spectrum, lambdas.x) * scale;
-                double g = Model.Interpolate(para.Wavelengths, spectrum, lambdas.y) * scale;
-                double b = Model.Interpolate(para.Wavelengths, spectrum, lambdas.z) * scale;
+            string toString(List<double> spectrum, double scale)
+            {
+                double r = Interpolate(para.Wavelengths, spectrum, lambdas.x) * scale;
+                double g = Interpolate(para.Wavelengths, spectrum, lambdas.y) * scale;
+                double b = Interpolate(para.Wavelengths, spectrum, lambdas.z) * scale;
                 return $"float3({r:g},{g:g},{b:g})";
-            };
-            Func<DensityProfileLayer, string> densityLayer = (DensityProfileLayer layer) => {
+            }
+
+            string DensityLayer(DensityProfileLayer layer)
+            {
                 return $@"_DensityProfileLayer({layer.Width / para.LengthUnitInMeters},{layer.ExpTerm},{layer.ExpScale * para.LengthUnitInMeters},{layer.LinearTerm * para.LengthUnitInMeters},{layer.ConstantTerm})";
-            };
-            Func<List<DensityProfileLayer>, string> densityProfile = (List<DensityProfileLayer> layers) => {
+            }
+
+            string DensityProfile(List<DensityProfileLayer> layers)
+            {
                 const int layerCount = 2;
-                while (layers.Count < layerCount) {
+                while (layers.Count < layerCount)
+                {
                     layers.Insert(0, new DensityProfileLayer());
                 }
 
-                var nl = Environment.NewLine;
+                string nl = Environment.NewLine;
                 string result = $"_DensityProfile({nl}        ";
-                for (int i = 0; i < layerCount; i++) {
-                    result += densityLayer(layers[i]);
+                for (int i = 0; i < layerCount; i++)
+                {
+                    result += DensityLayer(layers[i]);
                     result += i < layerCount - 1 ? $",{nl}        " : ")";
                 }
-                return result;
-            };
 
-            var skyRGB = Model.ComputeSpectralRadianceToLuminanceFactors(para.Wavelengths, para.SolarIrradiance, -3);
-            var sunRGB = Model.ComputeSpectralRadianceToLuminanceFactors(para.Wavelengths, para.SolarIrradiance, 0);
+                return result;
+            }
+
+            Vector3 skyRGB = ComputeSpectralRadianceToLuminanceFactors(para.Wavelengths, para.SolarIrradiance, -3);
+            Vector3 sunRGB = ComputeSpectralRadianceToLuminanceFactors(para.Wavelengths, para.SolarIrradiance, 0);
             // $"float3({r},{g},{b})"
 
             string header = $@"
@@ -273,15 +287,15 @@ AtmosphereParameters _ATMOSPHERE()
     a.sun_angular_radius = {para.SunAngularRadius};
     a.bottom_radius = {para.BottomRadius / para.LengthUnitInMeters};
     a.top_radius = {para.TopRadius / para.LengthUnitInMeters};
-    a.rayleigh_density = {densityProfile(para.RayleighDensity)};
+    a.rayleigh_density = {DensityProfile(para.RayleighDensity)};
     a.rayleigh_scattering = {toString(para.RayleighScattering, para.LengthUnitInMeters)};
-    a.mie_density = {densityProfile(para.MieDensity)};
+    a.mie_density = {DensityProfile(para.MieDensity)};
     a.mie_scattering = {toString(para.MieScattering, para.LengthUnitInMeters)};
     a.mie_extinction = {toString(para.MieExtinction, para.LengthUnitInMeters)};
     a.mie_phase_function_g = {para.MiePhaseFunctionG};
-    a.absorption_density = {densityProfile(para.AbsorptionDensity)};
+    a.absorption_density = {DensityProfile(para.AbsorptionDensity)};
     a.absorption_extinction = {toString(para.AbsorptionExtinction, para.LengthUnitInMeters)};
-    a.ground_albedo = {toString(para.GroundAlbedo, 1.0)};
+    a.ground_albedo = float3(0.5450980392,0.7725490196,0.3411764706);
     a.mu_s_min = {Math.Cos(para.MaxSunZenithAngle)};
     return a;
 }}

@@ -25,9 +25,9 @@ AtmosphereParameters _ATMOSPHERE()
 {
     AtmosphereParameters a;
     a.solar_irradiance = float3(1.474,1.8504,1.91198);
-    a.sun_angular_radius = 0.004675;
-    a.bottom_radius = 6360;
-    a.top_radius = 6420;
+    a.sun_angular_radius = 0.04675;
+    a.bottom_radius = 636;
+    a.top_radius = 3642;
     a.rayleigh_density = _DensityProfile(
         _DensityProfileLayer(0,0,0,0,0),
         _DensityProfileLayer(0,1,-0.125,0,0));
@@ -42,7 +42,7 @@ AtmosphereParameters _ATMOSPHERE()
         _DensityProfileLayer(25,0,0,0.0666666666666667,-0.666666666666667),
         _DensityProfileLayer(0,0,0,-0.0666666666666667,2.66666666666667));
     a.absorption_extinction = float3(0.0006497166,0.0018809,8.501668e-05);
-    a.ground_albedo = float3(0.1,0.1,0.1);
+    a.ground_albedo = float3(0.5450980392,0.7725490196,0.3411764706);
     a.mu_s_min = -0.207911690817759;
     return a;
 }

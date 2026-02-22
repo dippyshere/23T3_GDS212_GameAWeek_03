@@ -8,21 +8,17 @@ public class DestroyOutOfBounds : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("CheckBounds", Random.Range(0f, 2f), 2);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        InvokeRepeating(nameof(CheckBounds), Random.Range(0f, 2f), 2);
     }
 
     private void CheckBounds()
     {
-        if (transform.position.y < -0 || transform.position.x < -24 || transform.position.x > 24)
+        if (!(transform.position.y < -0) && !(transform.position.x < -24) && !(transform.position.x > 24))
         {
-            playerControllerScript.RemoveTowerComponent(gameObject);
-            Destroy(gameObject);
+            return;
         }
+
+        playerControllerScript.RemoveTowerComponent(gameObject);
+        Destroy(gameObject);
     }
 }

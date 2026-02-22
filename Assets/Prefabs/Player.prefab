@@ -148,6 +148,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -169,9 +174,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8573568717837017876
 MonoBehaviour:
@@ -185,13 +192,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96dd6306aebffc0459ea5fff87bd87e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnInterval: 1
+  spawnInterval: 1.5
   towerComponents:
-  - {fileID: 5739292389884700329, guid: 489f48cd71493be439acd15cd8914406, type: 3}
+  - {fileID: 91247266173595128, guid: 06e488e1bd51f654b9e3815fcc240ebc, type: 3}
+  - {fileID: 5735355887833800577, guid: 2d8c5bd39c9157c4eb9ad28df0408b2f, type: 3}
+  - {fileID: 3723148167406817794, guid: 319f5aaa366746e42ba3e652c2394aaf, type: 3}
+  - {fileID: 3388579043416107664, guid: 6ba1d7638bbac9f4b8a557b032d02ce6, type: 3}
+  - {fileID: 6695629360326684662, guid: 41f3495731539e6479e579df7846506f, type: 3}
+  - {fileID: 7256573064063902173, guid: c4fb97c0e133e3f4f953161055e32950, type: 3}
   baseTowerRigidBody: {fileID: 904192778986232119}
   towerCentre: {fileID: 0}
   virtualCamera: {fileID: 0}
+  virtualCameraFramingTransposer: {fileID: 0}
   playerAnimator: {fileID: 1049310527216888828}
+  scoreText: {fileID: 0}
+  startButton: {fileID: 0}
+  restartButton: {fileID: 0}
+  gyroRotate: 0
 --- !u!54 &904192778986232119
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -199,10 +216,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2618403969736217638}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -236,7 +253,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 69
   m_IsActive: 1
 --- !u!4 &4601339273705647630
 Transform:
@@ -272,11 +289,15 @@ MonoBehaviour:
   m_EndAngleFade: 180
   m_UVScale: {x: 1, y: 1}
   m_UVBias: {x: 0, y: 0}
-  m_DecalLayerMask: 1
+  m_RenderingLayerMask:
+    serializedVersion: 0
+    m_Bits: 1
   m_ScaleMode: 0
   m_Offset: {x: 0, y: 0, z: 0}
   m_Size: {x: 2, y: 2, z: 0.3}
   m_FadeFactor: 0.85
+  version: 1
+  m_DecalLayerMask: 1
 --- !u!33 &6946582911593735366
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -297,11 +318,16 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
-  m_MotionVectors: 1
+  m_MotionVectors: 0
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -313,7 +339,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
+  m_ReceiveGI: 2
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -323,9 +349,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1001 &1049310527207497372
 PrefabInstance:
@@ -402,6 +430,14 @@ PrefabInstance:
     - target: {fileID: 9500000, guid: 053a4ed4c00048f48a8055551095d11e, type: 3}
       propertyPath: m_CullingMode
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 13700000, guid: 053a4ed4c00048f48a8055551095d11e, type: 3}
+      propertyPath: m_Quality
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 13700000, guid: 053a4ed4c00048f48a8055551095d11e, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

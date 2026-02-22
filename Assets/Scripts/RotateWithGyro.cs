@@ -1,20 +1,25 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class RotateWithGyro : MonoBehaviour
 {
-    // Start is called before the first frame update
+    InputAction rotationAction;
+
     void Start()
     {
-        Input.gyro.enabled = true;
+        rotationAction = InputSystem.actions.FindAction("Rotation");
+        InputSystem.EnableDevice(AttitudeSensor.current);
     }
 
     // Update is called once per frame
     void Update()
     {
-        Quaternion gyro = Input.gyro.attitude;
-        gyro = Quaternion.Euler(90, 0, 0) * new Quaternion(-gyro.x, -gyro.y, gyro.z, gyro.w);
-        transform.rotation = gyro;
+        InputSystem.EnableDevice(AttitudeSensor.current);
+
+        Quaternion rotation = rotationAction.ReadValue<Quaternion>();
+        transform.rotation = Quaternion.Euler(90, 0, 0) * rotation;
     }
 }

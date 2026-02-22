@@ -124,9 +124,9 @@ MonoBehaviour:
     - 1.1058
     - 1.07124
     - 1.04992
-    SunAngularRadius: 0.004675
-    BottomRadius: 6360000
-    TopRadius: 6420000
+    SunAngularRadius: 0.04675
+    BottomRadius: 636000
+    TopRadius: 3642000
     RayleighScattering:
     - 0.00007386331161408323
     - 0.00006619602051264539

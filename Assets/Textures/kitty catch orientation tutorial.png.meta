@@ -53,7 +53,7 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: -1
+  spriteTessellationDetail: 0.03
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -148,17 +148,45 @@ TextureImporter:
   spriteSheet:
     serializedVersion: 2
     sprites: []
-    outline: []
+    outline:
+    - - {x: -417, y: -325}
+      - {x: -102, y: -146}
+      - {x: 101, y: -119}
+      - {x: 166, y: -94}
+      - {x: 191, y: -77}
+      - {x: 188, y: -55}
+      - {x: 496, y: -63}
+      - {x: 512, y: -32}
+      - {x: 512, y: 208}
+      - {x: 475, y: 236}
+      - {x: 194, y: 223}
+      - {x: 140, y: 260}
+      - {x: 126, y: 261}
+      - {x: -36, y: 261}
+      - {x: -175, y: 56}
+      - {x: -461, y: -90}
+      - {x: -489, y: -121}
+      - {x: -490, y: -163}
+      - {x: -490, y: -321}
+      - {x: -477, y: -330}
+      - {x: -437, y: -330}
+    - - {x: -478, y: -141}
+      - {x: -477, y: -140}
+      - {x: -477, y: -139}
+      - {x: -475, y: -139}
+      - {x: -475, y: -141}
     customData: 
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 0
+    internalID: 1537655665
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
     nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

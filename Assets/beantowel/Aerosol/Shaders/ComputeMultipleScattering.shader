@@ -37,7 +37,7 @@ Shader "Aerosol/ComputeMultipleScattering"
 
             struct PS_OUTPUT
             {
-                float3 delta_multiple_scattering : SV_Target0;
+                float4 delta_multiple_scattering : SV_Target0;
                 float4 scattering : SV_Target1;
             };
 
@@ -53,9 +53,9 @@ Shader "Aerosol/ComputeMultipleScattering"
             {
                 PS_OUTPUT output;
                 float nu;
-                output.delta_multiple_scattering = ComputeMultipleScatteringTexture(
+                output.delta_multiple_scattering = float4(ComputeMultipleScatteringTexture(
                     ATMOSPHERE, transmittance_texture, scattering_density_texture,
-                    float3(input.texcoords, layer + 0.5), nu);
+                    float3(input.texcoords, layer + 0.5), nu), 1.0);
                 output.scattering = float4(
                     mul((float3x3)luminance_from_radiance, output.delta_multiple_scattering) /
                         RayleighPhaseFunction(nu),

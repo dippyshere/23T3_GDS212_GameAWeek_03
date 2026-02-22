@@ -33,8 +33,8 @@ Shader "Aerosol/ComputeSingleScattering"
 
             struct PS_OUTPUT
             {
-                float3 delta_rayleigh : SV_Target0;
-                float3 delta_mie : SV_Target1;
+                float4 delta_rayleigh : SV_Target0;
+                float4 delta_mie : SV_Target1;
                 float4 scattering : SV_Target2;
             };
 

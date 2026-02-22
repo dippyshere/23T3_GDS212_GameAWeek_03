@@ -36,10 +36,10 @@ Shader "Aerosol/ComputeTransmittance"
                 return output;
             }
 
-            float3 frag(VS_OUTPUT input) : SV_Target
+            float4 frag(VS_OUTPUT input) : SV_Target
             {
-                return ComputeTransmittanceToTopAtmosphereBoundaryTexture(
-                    ATMOSPHERE, input.texcoords);
+                return float4(ComputeTransmittanceToTopAtmosphereBoundaryTexture(
+                    ATMOSPHERE, input.texcoords), 1.0);
             }
             ENDHLSL
         }

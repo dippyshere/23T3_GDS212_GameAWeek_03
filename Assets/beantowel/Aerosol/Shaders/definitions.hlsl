@@ -100,6 +100,7 @@ macros. The full definitions are given in the
 #define PowerSpectrum float3
 // A function from Wavelength to SpectralIrradiance.
 #define IrradianceSpectrum float3
+#define IrradianceSpectrum4 float4
 // A function from Wavelength to SpectralRadiance.
 #define RadianceSpectrum float3
 // A function from Wavelength to SpectralRadianceDensity.

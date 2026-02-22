@@ -44,13 +44,13 @@ Shader "Aerosol/ComputeScatteringDensity"
                 return output;
             }
 
-            float3 frag(VS_OUTPUT input) : SV_Target
+            float4 frag(VS_OUTPUT input) : SV_Target
             {
-                return ComputeScatteringDensityTexture(
+                return float4(ComputeScatteringDensityTexture(
                     ATMOSPHERE, transmittance_texture, single_rayleigh_scattering_texture,
                     single_mie_scattering_texture, multiple_scattering_texture,
                     irradiance_texture, float3(input.texcoords, layer + 0.5),
-                    scattering_order);
+                    scattering_order), 1.0);
             }
             ENDHLSL
         }
