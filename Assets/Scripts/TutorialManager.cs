@@ -33,6 +33,14 @@ public class TutorialManager : MonoBehaviour
     {
         tutorialUI1.SetActive(false);
         tutorialUI2.SetActive(true);
+        try
+        {
+            InputSystem.EnableDevice(AttitudeSensor.current);
+        }
+        catch (Exception)
+        {
+            // ignore
+        }
     }
 
     public void TutorialGyroCheck()
@@ -40,7 +48,7 @@ public class TutorialManager : MonoBehaviour
         try
         {
             InputSystem.EnableDevice(AttitudeSensor.current);
-            if (AttitudeSensor.current.attitude.ReadValue() == new Quaternion(0f, 0f, 0f, 0f))
+            if (AttitudeSensor.current == null || AttitudeSensor.current.attitude.ReadValue() == default || AttitudeSensor.current.attitude.ReadValue().eulerAngles.sqrMagnitude < 0.0001f)
             {
                 tutorialUI1.SetActive(false);
                 tutorialUI2.SetActive(false);
